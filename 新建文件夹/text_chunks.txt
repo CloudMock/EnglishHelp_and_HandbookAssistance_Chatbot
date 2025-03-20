@@ -1,0 +1,134 @@
+Hello Students,  
+The note below is intended to help you check the suitability of your product concept.  It would also 
+be of benefit to re-read the assignment brief in detail, particularly the Q&A se
+---
+ction. 
+Please also see the slides and recordings from Week 1’s workshop. In particular, see the list of 
+products proposed by students in previous semesters. 
+Is my product innovative? 
+The innovatio
+---
+n may be in the process used to create the product, in the waste materials selected, or 
+in the design of the product itself.  Please see the information regarding this in the assignment brief, 
+and r
+---
+eview Week 1’s workshop where the concept of innovation is covered.  I expect that most 
+products will be a common item with an existing market but produced using waste materials. 
+Is your product pre
+---
+dominately made from waste materials? 
+It’s important that a significant majority of the materials used in your product are from waste 
+materials, so it can be marketed as a recycled product.   
+Have 
+---
+you proposed a specific product that could be sold to a customer?   
+It’s important to be quite specific in what your final product is.  This will also clarify who the 
+customer is and if there is a m
+---
+arket for this product.  Being specific about your product will also 
+assist you in Part 2 of this assignment when you will consider how to mass produce the product. 
+Do not propose multiple final pro
+---
+ducts, one is sufficient. 
+Do the waste materials in the product undergo significant engineering transformation?  
+It is not sufficient to simply collect waste materials or break waste products into t
+---
+heir components. 
+You are expected to propose a product concept that requires significant engineering transformation 
+to achieve.  The definition of a significant engineering transformation will vary 
+---
+by product type, but 
+it typically includes manufacturing and assembly, a chemical or physical transformation, or a 
+significant construction and installation process. 
+Could your product be mass prod
+---
+uced or manufactured at scale? 
+It must be possible to create your product using a consistent and repeatable process. This is 
+particularly important for Part 2 of this assignment, where you will cons
+---
+ider how to produce your 
+product at scale.  What does “at scale” mean? Depending on the product, this might involve the 
+production of 1,000 or 10,000 units.  This implies that a labour intensive, ha
+---
+ndicraft, custom product 
+is unsuitable. 
+A smaller number of units may be reasonable for larger final products. Let’s use the example of a 
+metal bus frame.  You do not need to propose how to produce
+---
+ 10,000 bus frames, but rather 100 
+frames may be more reasonable.  In this situation, it is acceptable to instead focus on the large 
+amount of waste metal that may be required, demonstrating that th
+---
+is is a process that will need to 
+be undertaken at scale in an engineering factory or workshop. 
+Can I use remanufacturing? 
+Remanufacturing may be used as long as the product meets the requirement f
+---
+or significant 
+engineering transformation, and the process used is not a handicraft, labour intensive, custom 
+process. With remanufacturing, it can be more difficult to show how your product is inno
+---
+vative, as 
+you are transforming “like” into “like”, so do take special care to demonstrate how your product or 
+process is innovative. 
+ 
+
+Referencing 
+Ensure you use IEEE referencing for this assign
+---
+ment.  Ensure you have sufficient in-text references to 
+support the claims you make in your rationale.   
+What is a commercial rationale? 
+Consider if there is a commercial benefit to selling the pro
+---
+duct to the company producing it. Is there 
+a decent sized market to sell it to?  Can the company potentially make money or profit from the sale 
+of the product?  It is very likely the product is only
+---
+ profitable when manufactured at scale, and not in 
+small quantities, due to fixed manufacturing overheads.  A detailed analysis is not expected here, 
+but you should consider, at a high level, does t
+---
+he product make sense commercially?   
+Can my product contain digital technologies? 
+In 2023, it is unlikely any digital system contained in a product manufactured at scale is going to be 
+made from r
+---
+ecycled materials. It's ok for products to include digital technologies, if the product still 
+meets the assignment requirement of being made predominately from waste materials.    
+ 
+I have had stude
+---
+nts propose products that meet the requirements, for example: 
+• 
+Products to produce cabling / insulation from waste cables. 
+• 
+Outdoor shelter built using recycled solar panels and solar panel moun
+---
+ts. 
+• 
+Refurbished e-cigarette batteries connected together in a recycled casing to create a power 
+bank (This was accepted although it is dubious it could produce a reliable product at scale). 
+Exam
+---
+ples of products that don’t meet the criteria: 
+• 
+AI rubbish sorting system (it's not made from waste materials). 
+• 
+A robot that can plant seeds and water them (it is not made from waste materials)
+---
+. 
+• 
+An app that helps identify waste products (the software clearly can't be made from waste 
+products). 
+• 
+A server motherboard made from recycled phone motherboards (it is unlikely this could be 
+---
+
+done at scale in an automated made, each construction would be custom). 
+Kind Regards 
+Nick Jerrat 
+Unit Co-ordinator, Engineering Management MGMT3000/MGMT5039 
+
+
+---

@@ -8,7 +8,7 @@ def extract_text_from_pdf(pdf_path):
     return text
 
 # example
-pdf_path = "example.pdf"  # Replace with your PDF file path
+pdf_path = "CUSG231025-1254-Undergraduates-Postgraduates-Programs_FAW_web_LR-1.pdf"  # Replace with your PDF file path
 pdf_text = extract_text_from_pdf(pdf_path)
 
 # Save to text file

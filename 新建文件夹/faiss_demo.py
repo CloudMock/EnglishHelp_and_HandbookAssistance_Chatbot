@@ -1,6 +1,6 @@
 from sentence_transformers import SentenceTransformer
 import numpy as np
-import faiss
+import faiss 
 # 加载模型
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 # 读取文本文件
