@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)
 
 OLLAMA_URL = "http://localhost:11434/api/generate"  # Ollama 默认地址
-MODEL_NAME = "llama3.1"
+MODEL_NAME = "english-help"
 
 @app.route("/chat", methods=["GET", "POST"])
 def chat():
