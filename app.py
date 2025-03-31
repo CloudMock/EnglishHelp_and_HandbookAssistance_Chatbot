@@ -6,7 +6,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-OLLAMA_URL = "http://localhost:11434/api/generate"  # Ollama 默认地址
+OLLAMA_URL = "http://localhost:11434/api/generate"  # Ollama address
 MODEL_NAME = "english-help"
 
 @app.route("/chat", methods=["GET", "POST"])
@@ -20,14 +20,14 @@ def chat():
     payload = {
         "model": MODEL_NAME,
         "prompt": user_input,
-        "stream": False  # 设为 True 可以流式返回
+        "stream": False
     }
 
     try:
         response = requests.post(OLLAMA_URL, json=payload)
         response_json = response.json()
 
-        # 确保返回的 JSON 是 UTF-8 编码
+        # ensure return JSON is UTF-8
         return Response(
             json.dumps({"response": response_json.get("response", "")+ "\n"}, ensure_ascii=False, indent=4),
             mimetype='application/json;charset=utf-8'
