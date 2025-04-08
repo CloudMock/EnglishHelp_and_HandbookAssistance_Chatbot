@@ -14,7 +14,7 @@ def chat():
         return jsonify({"error": "Message cannot be empty"}), 400
     
     try:
-        response = generate(model='qwen2', prompt=user_input)
+        response = generate(model='english-help', prompt=user_input)
         response_content = response.response
         
         if not response_content:
