@@ -7,8 +7,11 @@ import mysql.connector
 from mysql.connector import Error
 import bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+
 app.config["JWT_SECRET_KEY"] = "your_secret_key"  # Replace with a more secure key
 jwt = JWTManager(app)
 
@@ -97,13 +100,13 @@ def login():
 def chat():
     user_input = request.json.get("message", "")
     curtin_id = get_jwt_identity()  # Get the current user's Curtin_ID
-
     if not user_input:
         return jsonify({"error": "Message cannot be empty"}), 400
 
     payload = {
         "model": MODEL_NAME,
         "prompt": user_input,
+        "stream": False
     }
 
     try:
@@ -128,3 +131,4 @@ def chat():
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
+

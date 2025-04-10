@@ -6,3 +6,4 @@ That's a student project
 
 pip install flask mysql-connector-python bcrypt flask-jwt-extended
 
+
