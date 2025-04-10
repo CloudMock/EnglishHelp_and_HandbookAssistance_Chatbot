@@ -1,4 +1,9 @@
-# Project feature
-Prevent AI from answering irrelevant questions
-through the Modelfile implemented
+# EnglishHelp_and_HandbookAssistance_Chatbot
+That's a student project
+
+
+# at this version please ensure install blow:
+
+pip install flask mysql-connector-python bcrypt flask-jwt-extended
+
 

@@ -24,7 +24,9 @@ function sendMessage() {
     chatBody.appendChild(userMessage);
 
     var userInput = input.value;
+    
     input.value = "";
+
     chatBody.scrollTop = chatBody.scrollHeight;
 
     var loadingMessage = document.createElement("div");
@@ -73,6 +75,7 @@ function sendMessage() {
       });
   }
 }
+
 function handleKeyPress(event) {
   if (event.key === "Enter") {
     sendMessage();
@@ -90,3 +93,4 @@ document.addEventListener("DOMContentLoaded", function () {
     logoutButton.addEventListener("click", logout);
   }
 });
+
