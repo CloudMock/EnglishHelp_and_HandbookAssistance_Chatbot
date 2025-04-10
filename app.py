@@ -1,11 +1,4 @@
-<<<<<<< HEAD
 from flask import Flask, request, jsonify, Response
-=======
-# pip install flask mysql-connector-python bcrypt flask-jwt-extended
-
-from flask import Flask, request, jsonify, Response, session
-import requests
->>>>>>> origin/dev
 import json
 import mysql.connector
 from mysql.connector import Error
@@ -17,34 +10,8 @@ from ollama import generate
 app = Flask(__name__)
 CORS(app)
 
-<<<<<<< HEAD
-@app.route("/chat", methods=["GET", "POST"])
-def chat():
-    user_input = request.json.get("message", "")
-    
-    if not user_input:
-        return jsonify({"error": "Message cannot be empty"}), 400
-    
-    try:
-        response = generate(model='english-help', prompt=user_input)
-        response_content = response.response
-        
-        if not response_content:
-            raise ValueError("Ollama 返回的 JSON 为空")
-
-        # ensure return JSON is UTF-8
-        return Response(
-            json.dumps({"response": response_content}, ensure_ascii=False, indent=4),
-            mimetype='application/json;charset=utf-8'
-        )
-    
-=======
 app.config["JWT_SECRET_KEY"] = "your_secret_key"  # Replace with a more secure key
 jwt = JWTManager(app)
-
-# OLLAMA configuration
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "llama3"
 
 # Connecting to a database
 def get_db_connection():
@@ -72,7 +39,7 @@ def register():
     if not all([curtin_id, password, name, email]):
         return jsonify({"error": "All fields cannot be empty"}), 400
 
-    # 哈希密码
+    # Hash password
     hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
     conn = get_db_connection()
@@ -122,7 +89,7 @@ def login():
         conn.close()
 
 # Handling chat
-@app.route("/chat", methods=["POST"])
+@app.route("/chat", methods=["GET","POST"])
 @jwt_required()
 def chat():
     user_input = request.json.get("message", "")
@@ -130,37 +97,29 @@ def chat():
     if not user_input:
         return jsonify({"error": "Message cannot be empty"}), 400
 
-    payload = {
-        "model": MODEL_NAME,
-        "prompt": user_input,
-        "stream": False
-    }
-
     try:
-        response = requests.post(OLLAMA_URL, json=payload)
-        response_json = response.json()
-        bot_response = response_json.get("response", "") + "\n"
+        response = generate(model='english-help', prompt=user_input)
+        response_content = response.response
 
+        if not response_content:
+            raise ValueError("Ollama return empty JSON")
+        
         # Store chat history
         conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO Chat_history (Student_input, Bot_answer, Curtin_ID) VALUES (%s, %s, %s)",
-                           (user_input, bot_response, curtin_id))
+                           (user_input, response_content, curtin_id))
             conn.commit()
             cursor.close()
             conn.close()
 
-        return Response(json.dumps({"response": bot_response}, ensure_ascii=False, indent=4),
-                        mimetype='application/json;charset=utf-8')
->>>>>>> origin/dev
+        return Response(
+            json.dumps({"response": response_content}, ensure_ascii=False, indent=4),
+            mimetype='application/json;charset=utf-8')
+    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     app.run(debug=True, port=5000)
-=======
-    app.run(debug=True, port=5000)
-
->>>>>>> origin/dev
