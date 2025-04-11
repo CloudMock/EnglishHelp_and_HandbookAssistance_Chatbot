@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify, Response
+from flask_mysqldb import MySQL
+import config
 import json
 import mysql.connector
 from mysql.connector import Error
@@ -13,16 +15,22 @@ CORS(app)
 app.config["JWT_SECRET_KEY"] = "your_secret_key"  # Replace with a more secure key
 jwt = JWTManager(app)
 
+# Initialize Flask application
+app = Flask(__name__)
+
+# Configure the app with the database details from config.py
+app.config['MYSQL_HOST'] = config.DB_CONFIG['MYSQL_HOST']
+app.config['MYSQL_USER'] = config.DB_CONFIG['MYSQL_USER']
+app.config['MYSQL_PASSWORD'] = config.DB_CONFIG['MYSQL_PASSWORD']
+app.config['MYSQL_DB'] = config.DB_CONFIG['MYSQL_DB']
+
+# Initialize MySQL instance with Flask app
+mysql = MySQL(app)
+
 # Connecting to a database
 def get_db_connection():
     try:
-        connection = mysql.connector.connect(
-            host="localhost",
-            user="root",       # Replace with your database username
-            password="114514",  # Replace with your database password
-            database="EHAHC"
-        )
-        return connection
+        return mysql.connection
     except Error as e:
         print(f"Database connection failed: {e}")
         return None
