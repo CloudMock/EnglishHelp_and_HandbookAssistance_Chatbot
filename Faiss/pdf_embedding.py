@@ -13,9 +13,6 @@ def pdf_to_text(pdf_path):
     return text
 
 def split_text(text, max_chunk_length=500):
-    """
-    简单分块：按段落或定长分段
-    """
     paragraphs = text.split("\n")
     chunks = []
     chunk = ""
@@ -58,13 +55,13 @@ def main():
     model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
     index, _ = build_faiss_index(chunks, model)
 
-    # 保存文本块
+    # save txt chunks
     os.makedirs("store", exist_ok=True)
     chunk_path = os.path.join("store", "text_chunks.txt")
     with open(chunk_path, "w", encoding="utf-8") as f:
         f.write("\n====\n".join(chunks))
 
-    # 保存索引
+    # save index
     index_path = os.path.join("store", "student_handbook_faiss.index")
     faiss.write_index(index, index_path)
 
