@@ -1,3 +1,5 @@
+let currentMode = "englishHelp";
+
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("jwt_token");
 
@@ -5,8 +7,45 @@ document.addEventListener("DOMContentLoaded", function () {
     window.location.href = "login.html";
     return;
   }
+
+  initModelSelector();
+
   console.log("User is logged in, chat interface ready");
 });
+
+function initModelSelector() {
+  updateSelectedModel(currentMode);
+
+  document.querySelectorAll(".model-option").forEach((option) => {
+    option.addEventListener("click", function (e) {
+      e.preventDefault();
+      const selectedModel = this.getAttribute("data-model");
+
+      if (selectedModel !== currentMode) {
+        currentMode = selectedModel;
+        updateSelectedModel(currentMode);
+
+        let modelDisplayName = "English Help";
+        if (currentMode === "studentHandbook") {
+          modelDisplayName = "Student Handbook";
+        }
+        document.getElementById("currentModelText").textContent =
+          modelDisplayName;
+      }
+    });
+  });
+}
+
+function updateSelectedModel(modelName) {
+  document.querySelectorAll(".selected-icon").forEach((icon) => {
+    icon.classList.remove("visible");
+  });
+
+  const selectedCheck = document.getElementById(`${modelName}-check`);
+  if (selectedCheck) {
+    selectedCheck.classList.add("visible");
+  }
+}
 
 function sendMessage() {
   var input = document.getElementById("messageInput");
@@ -24,7 +63,7 @@ function sendMessage() {
     chatBody.appendChild(userMessage);
 
     var userInput = input.value;
-    
+
     input.value = "";
 
     chatBody.scrollTop = chatBody.scrollHeight;
@@ -36,13 +75,27 @@ function sendMessage() {
 
     const token = localStorage.getItem("jwt_token");
 
-    fetch("http://127.0.0.1:5000/chat", {
-      method: "POST",
-      headers: {
+    let endpoint, requestBody, headers;
+
+    if (currentMode === "englishHelp") {
+      endpoint = "http://127.0.0.1:5000/chat";
+      requestBody = JSON.stringify({ message: userInput });
+      headers = {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
-      },
-      body: JSON.stringify({ message: userInput }),
+      };
+    } else {
+      endpoint = "http://127.0.0.1:5000/search";
+      requestBody = JSON.stringify({ query: userInput });
+      headers = {
+        "Content-Type": "application/json",
+      };
+    }
+
+    fetch(endpoint, {
+      method: "POST",
+      headers: headers,
+      body: requestBody,
     })
       .then((response) => {
         if (response.status === 401) {
@@ -93,4 +146,3 @@ document.addEventListener("DOMContentLoaded", function () {
     logoutButton.addEventListener("click", logout);
   }
 });
-
