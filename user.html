@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Information - Qutin</title>
+  <link rel="stylesheet" href="user.css">
+</head>
+<body>
+  <!-- 背景图片 -->
+  <div class="background"></div>
+
+  <header>
+    <!-- Qutin 左上角 Logo -->
+    <img src="user_image/Qutin Logo.png" alt="Qutin Logo" class="logo">
+  </header>
+
+  <main>
+    <div class="user-info">
+      <div class="avatar">
+        <!-- 中间头像 -->
+        <img src="user_image/User profile.png" alt="User Avatar" id="avatar-img">
+        <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+      </div>
+
+      <!-- 学生名字 -->
+      <h1 class="student-name" id="student-name">Student Name</h1>
+
+      <!-- 第一个卡片 -->
+      <div class="card">
+        <img src="user_image/Rectangle 2757.png" alt="Card Background" class="card-background">
+        <div class="card-content">
+          <span>Total conversations</span>
+          <span id="conversation-count">114</span>
+        </div>
+      </div>
+
+      <!-- 第二个卡片 -->
+      <div class="card">
+        <img src="user_image/Rectangle 2758.png" alt="Card Background" class="card-background">
+        <div class="card-content">
+          <span>Total Usage Days</span>
+          <span id="usage-days">51</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="user.js"></script>
+</body>
+</html>
