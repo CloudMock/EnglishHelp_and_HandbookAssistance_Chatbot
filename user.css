@@ -1,0 +1,105 @@
+/* 页面整体使用背景图片 */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* 背景图 */
+.background {
+    background-image: url('user_image/04b9aa7a3933506b6e7f6f917e27f6c.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+}
+
+/* Header部分 */
+header {
+    padding: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.logo {
+    height: 40px;
+}
+
+/* 主体部分 */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+    margin-top: 30px;
+}
+
+/* 用户信息整体 */
+.user-info {
+    text-align: center;
+}
+
+/* 头像区域 */
+.avatar {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.avatar img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    transition: 0.3s;
+}
+
+.avatar:hover img {
+    opacity: 0.7;
+}
+
+/* 学生名字 */
+.student-name {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+/* 卡片布局 */
+.card {
+    position: relative;
+    width: 300px;
+    margin: 15px auto;
+}
+
+.card-background {
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* 卡片中的文字 */
+.card-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 25px;
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+}
