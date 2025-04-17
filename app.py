@@ -8,6 +8,7 @@ import bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
 from ollama import generate
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 CORS(app)
@@ -66,6 +67,32 @@ def register():
     finally:
         cursor.close()
         conn.close()
+
+# Function to delete old chat history
+def delete_old_chat_history():
+    conn = get_db_connection()
+    if conn is None:
+        return
+
+    try:
+        cursor = conn.cursor()
+        # Delete all records older than 1 day without manually calculating expiration_time
+        cursor.execute("""
+            DELETE FROM Chat_history
+            WHERE chat_time < NOW() - INTERVAL 1 DAY
+        """)
+        conn.commit()  # Commit the deletion operation
+
+    except Exception as e:
+        pass  # Ignore errors
+    finally:
+        cursor.close()
+        conn.close()
+
+# Schedule the delete operation to run once every day
+scheduler = BackgroundScheduler()
+scheduler.add_job(delete_old_chat_history, 'interval', days=1)  # Run daily
+scheduler.start()
 
 # User login
 @app.route("/login", methods=["POST"])
