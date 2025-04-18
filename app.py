@@ -8,7 +8,6 @@ import bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
 import ollama
-from get_context import get_recent_chat_context
 
 app = Flask(__name__)
 CORS(app)
@@ -30,14 +29,49 @@ def get_db_connection():
     try:
         connection = mysql.connector.connect(
             host="localhost",
-            user="root",
+            user="ehahc",
             password="114514",
             database="EHAHC"
         )
         return connection
     except Error as e:
         print(f"Database connection failed: {e}")
-        return None    
+        return None
+
+# get context from database
+def get_recent_chat_context(conn, num_QApair):
+    
+    messages = []
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Get the most recent n conversations
+        query = """
+            SELECT Student_input, Bot_answer
+            FROM Chat_history
+            ORDER BY Use_date DESC
+            LIMIT %s
+        """
+        cursor.execute(query, (num_QApair,))
+        rows = cursor.fetchall()
+
+        # reverse to normal word order
+        rows.reverse()
+
+        for row in rows:
+            messages.append({
+                'role': 'user',
+                'content': row['Student_input']
+            })
+            messages.append({
+                'role': 'assistant',
+                'content': row['Bot_answer']
+            })
+
+    finally:
+        cursor.close()
+
+    return messages 
 
 # User Registration
 @app.route("/register", methods=["POST"])
@@ -201,6 +235,17 @@ def search():
         
         if not response_content:
             raise ValueError("Ollama return empty JSON")
+
+        # store in database
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO Search_history 
+            (Student_input, Bot_answer, Curtin_ID) 
+            VALUES (%s, %s, %s)
+            """
+        cursor.execute(query, (user_input, response_content, curtin_id))
+        conn.commit()
+        cursor.close()
 
         # close database
         conn.close()
