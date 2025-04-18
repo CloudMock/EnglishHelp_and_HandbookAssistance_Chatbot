@@ -7,7 +7,8 @@ from mysql.connector import Error
 import bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
-from ollama import generate
+import ollama
+from get_context import get_recent_chat_context
 
 app = Flask(__name__)
 CORS(app)
@@ -19,22 +20,24 @@ index = faiss.read_index("Faiss/store/student_handbook_faiss.index")
 # read txt chunks
 with open("Faiss/store/text_chunks.txt", "r", encoding="utf-8") as f:
     text_chunks = f.read().split("\n====\n")
+
+# set secure key
 app.config["JWT_SECRET_KEY"] = "your_secret_key"  # Replace with a more secure key
 jwt = JWTManager(app)
 
-# Connecting to a database
+# Connect to a database
 def get_db_connection():
     try:
         connection = mysql.connector.connect(
             host="localhost",
-            user="root",       # Replace with your database username
-            password="114514",  # Replace with your database password
+            user="root",
+            password="114514",
             database="EHAHC"
         )
         return connection
     except Error as e:
         print(f"Database connection failed: {e}")
-        return None
+        return None    
 
 # User Registration
 @app.route("/register", methods=["POST"])
@@ -97,32 +100,51 @@ def login():
         cursor.close()
         conn.close()
 
-# Handling chat
+# English help
 @app.route("/chat", methods=["GET","POST"])
 @jwt_required()
 def chat():
+    # link to database
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 501
+
+    # Get the current user's Curtin_ID
+    curtin_id = get_jwt_identity()
+
+    # get user input
     user_input = request.json.get("message", "")
-    curtin_id = get_jwt_identity()  # Get the current user's Curtin_ID
     if not user_input:
         return jsonify({"error": "Message cannot be empty"}), 400
 
     try:
-        response = generate(model='english-help', prompt=user_input)
-        response_content = response.response
-
+        # get context add user input to get model response
+        messages = get_recent_chat_context(conn, 3)
+        messages.append({"role": "user", "content": user_input})
+        response = ollama.chat(
+            model = 'english-help',
+            messages = messages
+        )
+        response_content = response.message.content
+        print(response.message)
         if not response_content:
             raise ValueError("Ollama return empty JSON")
         
-        # Store chat history
-        conn = get_db_connection()
-        if conn:
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO Chat_history (Student_input, Bot_answer, Curtin_ID) VALUES (%s, %s, %s)",
-                           (user_input, response_content, curtin_id))
-            conn.commit()
-            cursor.close()
-            conn.close()
+        # store in database
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO Chat_history 
+            (Student_input, Bot_answer, Curtin_ID) 
+            VALUES (%s, %s, %s)
+            """
+        cursor.execute(query, (user_input, response_content, curtin_id))
+        conn.commit()
+        cursor.close()
+        
+        # close database
+        conn.close()
 
+        # ensure return JSON is UTF-8
         return Response(
             json.dumps({"response": response_content}, ensure_ascii=False, indent=4),
             mimetype='application/json;charset=utf-8'
@@ -131,40 +153,57 @@ def chat():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# hanbook search
 @app.route('/search', methods=["GET", "POST"])
 def search():
-
-    query_text = request.json.get("query", "")
-    print(query_text)
-    if not query_text:
+    # link to database
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 501
+    
+    # Get the current user's Curtin_ID
+    curtin_id = get_jwt_identity()
+    
+    # get user input
+    user_input = request.json.get("query", "")
+    if not user_input:
         return jsonify({"error": "query is required"}), 400
+    query_vector = model.encode([user_input]) # Vectorization, embedding user input
 
-    # Vectorization
-    query_vector = model.encode([query_text])
-
-    # FAISS search
+    # search handbook content from user input
     k = 3  # count of search result
     distances, indices = index.search(query_vector, k)
-
     # print("\nQuery Result：")
     # for i, idx in enumerate(indices[0]):
     #     print(f"\nSimilarity ranking {i+1}: ")
     #     print(text_chunks[idx])
     #     print(f"🔹 Similarity (L2 distance): {distances[0][i]}")
     #     print("-" * 40)
-        
     results = []
     for i, idx in enumerate(indices[0]):
         results.append(text_chunks[idx])
-    
-    print(results)
+    # print(results)
 
     try:
-        response = generate(model='qwen2', prompt=f"follow below information: {results}\n answer the question: {query_text}, as briefly as possible")
-        response_content = response.response
+        # get context add user input to get model response
+        messages = get_recent_chat_context(conn, 3)
+        search_with_prompt= f"""
+        follow below information: {results}
+        answer the question: {user_input}
+        as briefly as possible
+        """
+        messages.append({"role": "user", "content": search_with_prompt})
+        response = ollama.chat(
+            model = 'qwen2',
+            messages = messages
+        )
+        response_content = response.message.content
         
         if not response_content:
             raise ValueError("Ollama return empty JSON")
+
+        # close database
+        conn.close()
 
         # ensure return JSON is UTF-8
         return Response(
