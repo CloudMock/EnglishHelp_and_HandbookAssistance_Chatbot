@@ -1,4 +1,4 @@
-from get_context import get_recent_chat_context
+from app import get_recent_chat_context
 import mysql.connector
 
 def get_db_connection():
