@@ -39,8 +39,8 @@ def get_db_connection():
         return None
 
 # get context from database
-def get_recent_chat_context(conn, num_QApair):
-    
+def get_recent_chat_context(conn, num_QApair: int):
+
     messages = []
     cursor = conn.cursor(dictionary=True)
 
@@ -71,7 +71,14 @@ def get_recent_chat_context(conn, num_QApair):
     finally:
         cursor.close()
 
-    return messages 
+    return messages
+
+def store_in_db (conn, query: str, values: tuple):
+    # store in database
+    cursor = conn.cursor()
+    cursor.execute(query, values)
+    conn.commit()
+    cursor.close()
 
 # User Registration
 @app.route("/register", methods=["POST"])
@@ -93,15 +100,16 @@ def register():
         return jsonify({"error": "Database connection failed"}), 500
 
     try:
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO Student (Curtin_ID, Password, Student_name, Student_email) VALUES (%s, %s, %s, %s)",
-                       (curtin_id, hashed_password.decode("utf-8"), name, email))
-        conn.commit()
+        query = """
+        INSERT INTO Student (Curtin_ID, Password, Student_name, Student_email) 
+        VALUES (%s, %s, %s, %s)
+        """
+        values = (curtin_id, hashed_password.decode("utf-8"), name, email)
+        store_in_db(conn, query, values)
         return jsonify({"message": "Successful registration"}), 201
     except Error as e:
         return jsonify({"error": str(e)}), 500
     finally:
-        cursor.close()
         conn.close()
 
 # User login
@@ -165,15 +173,12 @@ def chat():
             raise ValueError("Ollama return empty JSON")
         
         # store in database
-        cursor = conn.cursor()
         query = """
-            INSERT INTO Chat_history 
-            (Student_input, Bot_answer, Curtin_ID) 
+            INSERT INTO Chat_history (Student_input, Bot_answer, Curtin_ID) 
             VALUES (%s, %s, %s)
             """
-        cursor.execute(query, (user_input, response_content, curtin_id))
-        conn.commit()
-        cursor.close()
+        values = (user_input, response_content, curtin_id)
+        store_in_db(conn, query, values)
         
         # close database
         conn.close()
@@ -232,15 +237,12 @@ def search():
             raise ValueError("Ollama return empty JSON")
 
         # store in database
-        cursor = conn.cursor()
         query = """
-            INSERT INTO Search_history 
-            (Student_input, Bot_answer, Curtin_ID) 
+            INSERT INTO Search_history (Student_input, Bot_answer, Curtin_ID) 
             VALUES (%s, %s, %s)
             """
-        cursor.execute(query, (user_input, response_content, curtin_id))
-        conn.commit()
-        cursor.close()
+        values = (user_input, response_content, curtin_id)
+        store_in_db(conn, query, values)
 
         # close database
         conn.close()
