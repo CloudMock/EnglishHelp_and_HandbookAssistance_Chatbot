@@ -189,6 +189,7 @@ def chat():
 
 # hanbook search
 @app.route('/search', methods=["GET", "POST"])
+@jwt_required()
 def search():
     # link to database
     conn = get_db_connection()
@@ -206,13 +207,7 @@ def search():
 
     # search handbook content from user input
     k = 3  # count of search result
-    distances, indices = index.search(query_vector, k)
-    # print("\nQuery Result：")
-    # for i, idx in enumerate(indices[0]):
-    #     print(f"\nSimilarity ranking {i+1}: ")
-    #     print(text_chunks[idx])
-    #     print(f"🔹 Similarity (L2 distance): {distances[0][i]}")
-    #     print("-" * 40)
+    _, indices = index.search(query_vector, k)
     results = []
     for i, idx in enumerate(indices[0]):
         results.append(text_chunks[idx])
