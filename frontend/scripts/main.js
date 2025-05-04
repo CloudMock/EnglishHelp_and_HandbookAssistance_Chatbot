@@ -89,6 +89,7 @@ function sendMessage() {
       requestBody = JSON.stringify({ query: userInput });
       headers = {
         "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
       };
     }
 
@@ -97,35 +98,44 @@ function sendMessage() {
       headers: headers,
       body: requestBody,
     })
-      .then((response) => {
-        if (response.status === 401) {
-          localStorage.removeItem("jwt_token");
-          window.location.href = "login.html";
-          throw new Error("Session expired. Please login again.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        chatBody.removeChild(loadingMessage);
-
-        var botMessage = document.createElement("div");
-        botMessage.classList.add("message", "bot");
-        botMessage.textContent = data.response;
-        chatBody.appendChild(botMessage);
-        chatBody.scrollTop = chatBody.scrollHeight;
-      })
-      .catch((error) => {
-        if (loadingMessage.parentNode === chatBody) {
-          chatBody.removeChild(loadingMessage);
-        }
-
-        var errorMessage = document.createElement("div");
-        errorMessage.classList.add("message", "bot");
-        errorMessage.textContent =
-          "Sorry, I couldn't process your request. Please try again.";
-        chatBody.appendChild(errorMessage);
-        console.error("Error:", error);
-      });
+    .then((response) => {
+      if (response.status === 401) {
+        localStorage.removeItem("jwt_token");
+        window.location.href = "login.html";
+        throw new Error("Session expired. Please login again.");
+      }
+    
+      // 删除加载动画
+      chatBody.removeChild(loadingMessage);
+    
+      // 初始化 bot 响应块
+      var botMessage = document.createElement("div");
+      botMessage.classList.add("message", "bot");
+      botMessage.textContent = "";
+      chatBody.appendChild(botMessage);
+    
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+    
+      function readStream() {
+        reader.read().then(({ done, value }) => {
+          if (done) return;
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split("\n").filter((l) => l.startsWith("data: "));
+          for (let line of lines) {
+            botMessage.textContent += line.slice(6);
+          }
+          chatBody.scrollTop = chatBody.scrollHeight;
+          readStream();
+        });
+      }
+    
+      readStream();
+    })
+    .catch(err => {
+      console.error('Error:', err);
+    });
+    
   }
 }
 
