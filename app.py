@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, Response
-import json
 from sentence_transformers import SentenceTransformer
 import faiss
 import mysql.connector
@@ -11,6 +10,8 @@ import ollama
 
 app = Flask(__name__)
 CORS(app)
+
+client = ollama.Client(host='http://192.168.10.106:11434')
 
 # load embedding model and index
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
@@ -39,11 +40,13 @@ def get_db_connection():
         return None
 
 # get context from database
-def get_recent_chat_context(conn, num_QApair: int):
-
+def get_recent_chat_context(num_QApair: int):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+    
     messages = []
     cursor = conn.cursor(dictionary=True)
-
     try:
         # Get the most recent n conversations
         query = """
@@ -70,15 +73,30 @@ def get_recent_chat_context(conn, num_QApair: int):
 
     finally:
         cursor.close()
+        conn.close()
 
     return messages
 
-def store_in_db (conn, query: str, values: tuple):
-    # store in database
+def store_chat_in_db (query: str, values: tuple):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
     cursor = conn.cursor()
     cursor.execute(query, values)
     conn.commit()
     cursor.close()
+    conn.close()
+
+def stream_and_store(iterator, query, student_input, curtin_id):
+        bot_answer = ""
+        try:
+            for chunk in iterator:
+                text = chunk.message.content
+                bot_answer += text
+                yield f"data: {text}\n\n"
+        finally:
+            values = (student_input, curtin_id, bot_answer)
+            store_chat_in_db(query, values)
 
 # User Registration
 @app.route("/register", methods=["POST"])
@@ -98,18 +116,20 @@ def register():
     conn = get_db_connection()
     if conn is None:
         return jsonify({"error": "Database connection failed"}), 500
-
     try:
+        cursor = conn.cursor()
         query = """
         INSERT INTO Student (Curtin_ID, Password, Student_name, Student_email) 
         VALUES (%s, %s, %s, %s)
         """
         values = (curtin_id, hashed_password.decode("utf-8"), name, email)
-        store_in_db(conn, query, values)
+        cursor.execute(query, values)
+        conn.commit()
         return jsonify({"message": "Successful registration"}), 201
     except Error as e:
         return jsonify({"error": str(e)}), 500
     finally:
+        cursor.close()
         conn.close()
 
 # User login
@@ -146,11 +166,6 @@ def login():
 @app.route("/chat", methods=["GET","POST"])
 @jwt_required()
 def chat():
-    # link to database
-    conn = get_db_connection()
-    if conn is None:
-        return jsonify({"error": "Database connection failed"}), 501
-
     # Get the current user's Curtin_ID
     curtin_id = get_jwt_identity()
 
@@ -161,31 +176,24 @@ def chat():
 
     try:
         # get context add user input to get model response
-        messages = get_recent_chat_context(conn, 3)
+        messages = get_recent_chat_context(3)
         messages.append({"role": "user", "content": user_input})
-        response = ollama.chat(
+        iterator = client.chat(
             model = 'english-help',
-            messages = messages
+            messages = messages,
+            stream = True
         )
-        response_content = response.message.content
-        print(response.message)
-        if not response_content:
-            raise ValueError("Ollama return empty JSON")
         
         # store in database
         query = """
-            INSERT INTO Chat_history (Student_input, Bot_answer, Curtin_ID) 
+            INSERT INTO Chat_history (Student_input, Curtin_ID, Bot_answer) 
             VALUES (%s, %s, %s)
             """
-        values = (user_input, response_content, curtin_id)
-        store_in_db(conn, query, values)
-        
-        # close database
-        conn.close()
 
         # ensure return JSON is UTF-8
         return Response(
-            json.dumps({"response": response_content}, ensure_ascii=False, indent=4),
+            stream_and_store(iterator, query, user_input, curtin_id), 
+            content_type='text/event-stream',
             mimetype='application/json;charset=utf-8'
         )
 
@@ -196,11 +204,6 @@ def chat():
 @app.route('/search', methods=["GET", "POST"])
 @jwt_required()
 def search():
-    # link to database
-    conn = get_db_connection()
-    if conn is None:
-        return jsonify({"error": "Database connection failed"}), 501
-    
     # Get the current user's Curtin_ID
     curtin_id = get_jwt_identity()
     
@@ -220,36 +223,29 @@ def search():
 
     try:
         # get context add user input to get model response
-        messages = get_recent_chat_context(conn, 3)
+        messages = get_recent_chat_context(3)
         search_with_prompt= f"""
         follow below information: {results}
         answer the question: {user_input}
         as briefly as possible
         """
         messages.append({"role": "user", "content": search_with_prompt})
-        response = ollama.chat(
+        iterator = client.chat(
             model = 'qwen2',
-            messages = messages
+            messages = messages,
+            stream = True
         )
-        response_content = response.message.content
-        
-        if not response_content:
-            raise ValueError("Ollama return empty JSON")
 
         # store in database
         query = """
-            INSERT INTO Search_history (Student_input, Bot_answer, Curtin_ID) 
+            INSERT INTO Search_history (Student_input, Curtin_ID, Bot_answer) 
             VALUES (%s, %s, %s)
-            """
-        values = (user_input, response_content, curtin_id)
-        store_in_db(conn, query, values)
-
-        # close database
-        conn.close()
+        """
 
         # ensure return JSON is UTF-8
         return Response(
-            json.dumps({"response": response_content}, ensure_ascii=False, indent=4),
+            stream_and_store(iterator, query, user_input, curtin_id), 
+            content_type='text/event-stream',
             mimetype='application/json;charset=utf-8'
         )
     
