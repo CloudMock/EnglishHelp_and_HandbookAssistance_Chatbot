@@ -11,7 +11,7 @@ import ollama
 app = Flask(__name__)
 CORS(app)
 
-client = ollama.Client(host='http://192.168.10.106:11434')
+client = ollama.Client(host='http://localhost:11434')
 
 # load embedding model and index
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
