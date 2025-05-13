@@ -50,11 +50,16 @@
       font-family: Arial, sans-serif;
     }
 
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
       background-color: #f5f5f5;
       background-image: url("./LR-images/bg-6.png");
       background-size: cover;
@@ -66,60 +71,11 @@
       display: flex;
       width: 90%;
       max-width: 1600px;
-      min-height: 700px;
-      height: 85vh;
-      max-height: 1000px;
+      height: 90vh;
       background-color: white;
       border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    @media (max-width: 1200px) {
-      .login-container {
-        width: 95%;
-        height: 90vh;
-      }
-    }
-
-    @media (max-width: 992px) {
-      .login-container {
-        flex-direction: column;
-        width: 90%;
-        min-height: 800px;
-        height: auto;
-      }
-
-      .login-image {
-        flex: none;
-        height: 350px;
-      }
-
-      .login-form {
-        flex: 1;
-        padding: 40px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .login-container {
-        width: 95%;
-        min-height: 680px;
-      }
-
-      .login-image {
-        height: 250px;
-      }
-
-      .login-form {
-        padding: 30px;
-      }
-    }
-
-    @media (max-height: 800px) and (min-width: 993px) {
-      .login-container {
-        height: 90vh;
-      }
     }
 
     .login-image {
@@ -134,6 +90,7 @@
       padding: 50px;
       display: flex;
       flex-direction: column;
+      overflow-y: auto;
     }
 
     .logo-container {
@@ -179,6 +136,10 @@
       background-color: #f8f8f8;
     }
 
+    .confirm-password {
+      margin-top: 10px;
+    }
+
     .sign-in-btn {
       width: 100%;
       padding: 12px;
@@ -203,15 +164,40 @@
     }
 
     .signup-link {
-      margin-top: 0;
       text-align: center;
       font-size: 14px;
       color: #666;
+      margin-top: auto;
     }
 
     .signup-link a {
       color: #1da1f2;
       text-decoration: none;
+    }
+
+    @media (max-width: 992px) {
+      html,
+      body {
+        height: auto;
+        overflow: auto;
+      }
+
+      .login-container {
+        flex-direction: column;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+      }
+
+      .login-image {
+        height: 250px;
+      }
+
+      .login-form {
+        padding: 30px;
+        max-height: none;
+        overflow: visible;
+      }
     }
   </style>
 </html>
