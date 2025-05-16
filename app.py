@@ -252,6 +252,30 @@ def search():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/user/profile", methods=["GET"])
+@jwt_required()
+def user_profile():
+    curtin_id = get_jwt_identity()
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT Student_name, Student_email FROM Student WHERE Curtin_ID = %s", (curtin_id,))
+        user = cursor.fetchone()
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+        cursor.execute("SELECT COUNT(*) as total FROM Chat_history WHERE Curtin_ID = %s", (curtin_id,))
+        chat_count = cursor.fetchone()["total"]
+        return jsonify({
+            "name": user["Student_name"],
+            "email": user["Student_email"],
+            "total_conversations": chat_count
+        })
+    finally:
+        cursor.close()
+        conn.close()
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="author" content="Shiye" />
+    <meta name="description" content="User profile page for Qutin chatbot" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Info</title>
+    <link rel="stylesheet" href="styles/style.css" />
+    <link rel="stylesheet" href="user.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="user.js" defer></script>
+    <style>
+      body {
+        background-image: url("./LR-images/bg-6.png");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      class="container-fluid min-vh-100 d-flex align-items-center justify-content-center"
+      style="padding-top: 0"
+    >
+      <div class="user-profile-card p-4">
+        <div class="user-avatar-container mx-auto mb-3">
+          <div class="user-avatar" id="userAvatar">
+            <img
+              id="avatarImage"
+              src=""
+              alt="User Photo"
+              style="display: none"
+            />
+            <span id="userInitials">U</span>
+          </div>
+        </div>
+        <div class="user-info text-center">
+          <h2 id="userName" class="mb-1">User Name</h2>
+          <p id="userEmail" class="text-muted mb-3">user@example.com</p>
+        </div>
+        <div class="stats-item mt-3 mb-4">
+          <span class="stats-label">Total Conversations</span>
+          <span class="stats-value" id="totalConversations">0</span>
+        </div>
+        <div class="d-flex justify-content-center gap-3 mt-2">
+          <a
+            href="index.html"
+            class="btn btn-outline-primary rounded-pill px-4"
+          >
+            <i class="bi bi-chat-dots"></i> Back to Chat
+          </a>
+          <button
+            id="logoutButton"
+            class="btn btn-outline-danger rounded-pill px-4"
+          >
+            <i class="bi bi-box-arrow-right"></i> Log out
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
