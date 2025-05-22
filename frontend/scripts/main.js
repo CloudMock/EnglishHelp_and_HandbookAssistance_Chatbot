@@ -46,6 +46,11 @@ function initModelSelector() {
         }
         document.getElementById("currentModelText").textContent =
           modelDisplayName;
+
+        const newChatBtn = document.getElementById("newChatBtn");
+        if (newChatBtn) {
+          newChatBtn.click();
+        }
       }
     });
   });
